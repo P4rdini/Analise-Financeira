@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Transações</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        h2 {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .buy {
+            color: green;
+            font-weight: bold;
+        }
+        .sell {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Histórico de Transações</h2>
+
+<table>
+    <thead>
+    <tr>
+        <th>Ativo</th>
+        <th>Tipo</th>
+        <th>Preço</th>
+        <th>Quantidade</th>
+        <th>Data</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="transacao : ${transacoes}">
+        <td th:text="${transacao.symbol}"></td>
+        <td th:text="${transacao.type}" th:classappend="${transacao.type == 'BUY'} ? 'buy' : 'sell'"></td>
+        <td th:text="${transacao.price}"></td>
+        <td th:text="${transacao.quantity}"></td>
+        <td th:text="${#temporals.format(transacao.date, 'dd/MM/yyyy HH:mm')}"></td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

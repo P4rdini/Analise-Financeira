@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carteira - Controle Financeiro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Controle Financeiro</a>
+        <div class="d-flex">
+            <span class="navbar-text me-3">Olá, <span th:text="${username}"></span></span>
+            <a href="/do-logout" class="btn btn-outline-danger">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header">Evolução da Carteira</div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <canvas id="rentabilidadeChart"></canvas>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Resumo</h5>
+                                    <p>Total Investido: <span th:text="${#numbers.formatCurrency(totalInvestido)}">R$ </span></p>
+                                    <p>Valor Atual: <span th:text="${#numbers.formatCurrency(totalAtual)}">R$ </span></p>
+                                    <p th:class="${rentabilidadeTotal >= 0 ? 'text-success' : 'text-danger'}">
+                                        Rentabilidade: <span th:text="${#numbers.formatDecimal(rentabilidadeTotal, 1, 2)}">%</span>%
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Detalhes das Ações</div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th>Ativo</th>
+                                <th>Quantidade</th>
+                                <th>Preço Médio</th>
+                                <th>Preço Atual</th>
+                                <th>Valor Investido</th>
+                                <th>Valor Atual</th>
+                                <th>Lucro/Prejuízo</th>
+                                <th>Rentabilidade</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="item : ${stocksComRentabilidade}">
+                                <td th:text="${item.stock.symbol}"></td>
+                                <td th:text="${item.stock.quantity}"></td>
+                                <td th:text="${#numbers.formatCurrency(item.stock.avgPrice)}"></td>
+                                <td th:text="${#numbers.formatCurrency(item.stock.currentPrice)}"></td>
+                                <td th:text="${#numbers.formatCurrency(item.valorInvestido)}"></td>
+                                <td th:text="${#numbers.formatCurrency(item.valorAtual)}"></td>
+                                <td th:class="${item.lucroPrejuizo >= 0 ? 'text-success' : 'text-danger'}"
+                                    th:text="${#numbers.formatCurrency(item.lucroPrejuizo)}"></td>
+                                <td th:class="${item.rentabilidade >= 0 ? 'text-success' : 'text-danger'}"
+                                    th:text="${#numbers.formatDecimal(item.rentabilidade, 1, 2)} + '%'"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('rentabilidadeChart').getContext('2d');
+        const rentabilidadeChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Investido', 'Atual'],
+                datasets: [{
+                    label: 'Valor da Carteira (R$)',
+                    data: [
+                        [[${totalInvestido}]],
+                        [[${totalAtual}]]
+                    ],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.5)',
+                        [[${rentabilidadeTotal >= 0 ? "'rgba(75, 192, 192, 0.5)'" : "'rgba(255, 99, 132, 0.5)'"}]]
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        [[${rentabilidadeTotal >= 0 ? "'rgba(75, 192, 192, 1)'" : "'rgba(255, 99, 132, 1)'"}]]
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
