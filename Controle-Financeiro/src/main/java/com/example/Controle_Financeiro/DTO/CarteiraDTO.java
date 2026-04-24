@@ -10,4 +10,6 @@ public class CarteiraDTO {
     double totalInvestido;
     double totalAtual;
     double rentabilidadeTotal;
+    double retornoDiariototal;
+    double lucroTotal;
 }

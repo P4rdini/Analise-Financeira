@@ -164,8 +164,10 @@ public class AuthController {
 
         try {
             SequencedCollection<StockDTO> stocks = walletService.getAçõesCarteira(username);
-            System.out.println(stocks.toString());
+            CarteiraDTO carteira = walletService.montarCarteira(username, stocks);
+            System.out.println("retorno da carteira "+ carteira.toString());
             model.addAttribute("stocks",stocks);
+            model.addAttribute("carteira",carteira);
         }catch ( Exception e){
             String servidor = "";
             if(e.getMessage().contains("8081")){

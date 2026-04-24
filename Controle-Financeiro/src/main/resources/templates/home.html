@@ -60,17 +60,17 @@
                 <div class="d-flex justify-content-between align-items-end">
                     <div>
                         <span class="small text-muted">Lucro Total</span>
-                        <h3 class="text-success fw-bold mb-0">R$ 655,90</h3>
+                        <h3 class="fw-bold mb-0" th:classappend="${carteira.lucroTotal <0} ? 'text-danger' : 'text-success'" th:text=" 'R$ '+ ${#numbers.formatDecimal(carteira.lucroTotal,1,2)}"></h3>
                     </div>
                     <div class="text-end">
-                        <span class="small text-muted">Rentabilidade</span>
-                        <h4 class="text-success fw-bold mb-0">327,95% <i class="bi bi-caret-up-fill"></i></h4>
+                        <span class="small text-muted">Rentabilidade Total</span>
+                        <h4 class="fw-bold mb-0" th:classappend="${carteira.getRentabilidadeTotal <0} ? 'text-danger' : 'text-success'" th:text="${#numbers.formatDecimal(carteira.getRentabilidadeTotal, 1, 2)}+'%'"><i class="bi bi-caret-up-fill"></i></h4>
                     </div>
                 </div>
                 <hr class="my-3 opacity-25">
                 <div class="d-flex justify-content-between">
-                    <span class="text-muted small">Retorno Diário</span>
-                    <span class="fw-bold text-success">+ R$ 90,00</span>
+                    <span class="text-muted small">Retorno Diário Total</span>
+                    <span class="fw-bold" th:classappend="${carteira.retornoDiariototal <0} ? 'text-danger' : 'text-success'" th:text=" 'R$ '+ ${#numbers.formatDecimal(carteira.retornoDiariototal,1,2)}"></span>
                 </div>
             </div>
         </div>
@@ -109,7 +109,7 @@
                     <th>Retorno Diário <i class="bi bi-question-circle text-muted" data-bs-toggle="tooltip" title="Variação entre o fechamento anterior e o atual."></i></th>
                     <th>SMA <i class="bi bi-question-circle text-muted" data-bs-toggle="tooltip" title="Média dos últimos 14 dias"></i></th>
                     <th>RSI <i class="bi bi-question-circle text-muted" data-bs-toggle="tooltip" title="Força de compra e venda (0-100)"></i></th>
-                    <th>Bollinger</th>
+                    <th>Bollinger <i class="bi bi-question-circle text-muted" data-bs-toggle="tooltip" data-bs-html="true" title="1º número = faixa de preço alto <br>2º = preço médio recente<br>3º = faixa de preço baixo<br>Ajuda a ver se o preço está caro ou barato no momento."></i></th>
                     <th class="pe-4 text-end">Volume Médio</th>
                 </tr>
                 </thead>

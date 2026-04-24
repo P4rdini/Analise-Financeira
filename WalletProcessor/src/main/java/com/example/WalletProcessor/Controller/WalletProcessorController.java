@@ -93,13 +93,17 @@ public class WalletProcessorController {
 
         double totalInvestido = 0;
         double totalAtual = 0;
+        double retornoDiarioTotal = 0;
+        double lucroTotal = 0;
         List<Map<String, Object>> stocksComRentabilidade = new ArrayList<>();
 
         for (AnaliseTecnicaDTO stock : acoes) {
             double valorInvestido = stock.getAvgPrice() * stock.getQuantity();
             double valorAtual = stock.getCurrentPrice() * stock.getQuantity();
             double lucroPrejuizo = valorAtual - valorInvestido;
-            double rentabilidade = (lucroPrejuizo / valorInvestido) * 100;
+            double rentabilidade = valorInvestido > 0 ? (lucroPrejuizo / valorInvestido) * 100 : 0;
+
+            retornoDiarioTotal += stock.getRetornoDiario();
 
             Map<String, Object> stockData = new HashMap<>();
             stockData.put("stock", stock);
@@ -113,13 +117,16 @@ public class WalletProcessorController {
             totalInvestido += valorInvestido;
             totalAtual += valorAtual;
         }
-
-        double rentabilidadeTotal = ((totalAtual - totalInvestido) / totalInvestido) * 100;
+        lucroTotal = totalAtual - totalInvestido;
+        double rentabilidadeTotal = totalInvestido > 0 ? ((totalAtual - totalInvestido) / totalInvestido) * 100 : 0;
         CarteiraDTO carteira = new CarteiraDTO();
-        carteira.setRentabilidadeTotal(rentabilidadeTotal);
         carteira.setTotalAtual(totalAtual);
         carteira.setTotalInvestido(totalInvestido);
+        carteira.setRentabilidadeTotal(rentabilidadeTotal);
+        carteira.setLucroTotal(lucroTotal);
+        carteira.setRetornoDiariototal(retornoDiarioTotal);
         carteira.setStocksComRentabilidade(stocksComRentabilidade);
+
 
         return carteira;
     }
