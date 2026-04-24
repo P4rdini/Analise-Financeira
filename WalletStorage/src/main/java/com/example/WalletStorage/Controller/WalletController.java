@@ -1,6 +1,8 @@
 package com.example.WalletStorage.Controller;
 
+import com.example.WalletStorage.Model.AssetAutoComplete;
 import com.example.WalletStorage.Model.Wallet;
+import com.example.WalletStorage.Service.ServiceAssetAutoComplete;
 import com.example.WalletStorage.Service.ServiceRegistry;
 import com.example.WalletStorage.Service.ServiceStatus;
 import com.example.WalletStorage.exception.ServiceUnavailableException;
@@ -9,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/wallets")
@@ -17,6 +21,7 @@ public class WalletController {
     @Autowired
     WalletService walletService;
     @Autowired private ServiceRegistry serviceRegistry;
+    @Autowired private ServiceAssetAutoComplete serviceAutoComplete;
 
     // verificar status dos microserviços
     @GetMapping("/status")
@@ -96,7 +101,5 @@ public class WalletController {
         Wallet wallet = walletService.createWallet(userId);
         return ResponseEntity.ok().build();
     }
-
-
 
 }

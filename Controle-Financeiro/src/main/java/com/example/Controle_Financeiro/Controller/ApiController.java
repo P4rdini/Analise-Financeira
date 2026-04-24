@@ -2,6 +2,7 @@ package com.example.Controle_Financeiro.Controller;
 
 import com.example.Controle_Financeiro.DTO.*;
 import com.example.Controle_Financeiro.JWT.JwtUtil;
+import com.example.Controle_Financeiro.Service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,6 +26,7 @@ public class ApiController {
     private AuthenticationManager authenticationManager;
     @Autowired
     private JwtUtil jwtUtil;
+    @Autowired private WalletService walletService;
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request){
@@ -42,7 +44,7 @@ public class ApiController {
     public ResponseEntity<?> home(Principal principal){
         String username = principal.getName();
         try{
-            List<StockDTO> stocks = authController.getAçõesCarteira(username);
+            List<StockDTO> stocks = walletService.getAçõesCarteira(username);
             Map<String, Object> response = new HashMap<>();
             response.put("username", username);
             response.put("stocks",stocks);
@@ -65,7 +67,7 @@ public class ApiController {
     public ResponseEntity<?> getCarteira(Principal principal){
         String username = principal.getName();
         try{
-            SequencedCollection<StockDTO> acoes = authController.getAçõesCarteira(username);
+            SequencedCollection<StockDTO> acoes = walletService.getAçõesCarteira(username);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<SequencedCollection<StockDTO>> entity = new HttpEntity<>(acoes, headers);

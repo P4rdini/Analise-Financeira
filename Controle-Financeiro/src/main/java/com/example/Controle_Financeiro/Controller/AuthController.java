@@ -4,6 +4,7 @@ import com.example.Controle_Financeiro.Client.StockFetcherClient;
 import com.example.Controle_Financeiro.DTO.*;
 import com.example.Controle_Financeiro.JWT.JwtUtil;
 import com.example.Controle_Financeiro.Service.UserService;
+import com.example.Controle_Financeiro.Service.WalletService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
 @Controller
 public class AuthController {
 
-    @Autowired private StockFetcherClient stockFetcherClient;
+
     private String urlStorage = "http://localhost:8083/wallets/";
 
 
@@ -37,6 +38,7 @@ public class AuthController {
     @Autowired private JwtUtil jwtUtil;
     @Autowired private AuthenticationManager authManager;
     @Autowired private RestTemplate restTemplate;
+    @Autowired private WalletService walletService;
 
 
     @GetMapping("/transacao")
@@ -127,16 +129,9 @@ public class AuthController {
         String username = principal.getName();
         try {
 
-            SequencedCollection<StockDTO> acoes = getAçõesCarteira(principal.getName());
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<SequencedCollection<StockDTO>> entity = new HttpEntity<>(acoes, headers);
-            ResponseEntity<CarteiraDTO> response = restTemplate.postForEntity(
-                    "http://localhost:8082/test/snapshot/"+ username +"/carteira",
-                    entity,
-                    CarteiraDTO.class
-            );
-            CarteiraDTO carteira = response.getBody();
+            SequencedCollection<StockDTO> acoes = walletService.getAçõesCarteira(principal.getName());
+
+            CarteiraDTO carteira = walletService.montarCarteira(username,acoes);
 
             if(carteira != null){
                 model.addAttribute("stocksComRentabilidade", carteira.getStocksComRentabilidade());
@@ -168,7 +163,7 @@ public class AuthController {
         model.addAttribute("username",username);
 
         try {
-            SequencedCollection<StockDTO> stocks = getAçõesCarteira(username);
+            SequencedCollection<StockDTO> stocks = walletService.getAçõesCarteira(username);
             System.out.println(stocks.toString());
             model.addAttribute("stocks",stocks);
         }catch ( Exception e){
@@ -187,35 +182,5 @@ public class AuthController {
         return"home";
     }
 
-
-    public List<StockDTO> getAçõesCarteira(String username) throws Exception{
-        String walletStorageUrl = urlStorage + username + "/assets";
-
-
-        WalletAssetDTO[] symbolsDTO = restTemplate.getForObject(walletStorageUrl,WalletAssetDTO[].class);
-        List<String> symbols = Arrays.stream(symbolsDTO).map(WalletAssetDTO::getSymbol).collect(Collectors.toList());
-        Map<String, String> dadosAções = stockFetcherClient.getSnapshotDate(String.join(",",symbols));
-
-        List<StockDTO> stocks = new ArrayList<>();
-
-            SnapshotRequestDTO requestDTO = new SnapshotRequestDTO();
-            requestDTO.setDadosAcoes(dadosAções);
-            requestDTO.setSymbols(List.of(symbolsDTO));
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
-            HttpEntity<SnapshotRequestDTO> entity = new HttpEntity<>(requestDTO, headers);
-
-            ResponseEntity<StockDTO[]> response = restTemplate.postForEntity(
-                    "http://localhost:8082/test/snapshot/" + username,
-                    entity,
-                    StockDTO[].class
-            );
-            if(response.getBody() != null){
-                stocks = Arrays.asList(response.getBody());
-            }
-        return stocks;
-    }
 
 }
